@@ -179,11 +179,13 @@ namespace Library.Controllers
             {
                 return BadRequest();
             }
-            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser.User_Email)
+            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser)
         .FirstOrDefaultAsync();
-
+            if (curuser == null)
+            {
+                return BadRequest();
+            }
             book.Users.Add(curuser);
-
             await _context.SaveChangesAsync();
             return await GetInfo(book.Book_Name);
         }
@@ -201,17 +203,15 @@ namespace Library.Controllers
             {
                 return BadRequest();
             }
-            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser.User_Email)
+            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser)
         .FirstOrDefaultAsync();
             if (curuser == null)
             {
                 return BadRequest();
             }
-
-            curuser.Books.Remove(book);
-
+            book.Users.Remove(curuser);
             await _context.SaveChangesAsync();
-            return Ok();
+            return await GetInfo(book.Book_Name);
         }
     }
 }

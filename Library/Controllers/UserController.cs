@@ -58,6 +58,7 @@ namespace Library.Controller
             }
             else if (_context.Users.Any(info => info.User_Email == user.User_Email && info.User_Position == "client"))
             { token = CreateTokenClient(userjwt);}
+            Globals.CurUser = user.User_Email;
             return Ok(token);
         }
         /// <summary>
@@ -90,13 +91,11 @@ namespace Library.Controller
                 _configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            Globals.CurUser.User_Email = userjwt.Username;
             return jwt;
         }
         private string CreateTokenAdmin(UserJWT userjwt)
@@ -117,7 +116,6 @@ namespace Library.Controller
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            Globals.CurUser.User_Email = userjwt.Username;
             return jwt;
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

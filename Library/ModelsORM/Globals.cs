@@ -1,7 +1,7 @@
 ﻿namespace Library.ModelsORM
 {
-    public static class Globals
+    public class Globals
     {
-        public static User CurUser { get; set; } = new User();
+        public static string CurUser { get; set; }
     }
 }
