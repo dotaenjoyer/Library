@@ -54,7 +54,6 @@ namespace Library.Controllers
                 sb.Append("\r\n");
 
             }
-
             return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", "Books.csv");
         }
         /// <summary>
@@ -172,7 +171,7 @@ namespace Library.Controllers
         /// <returns></returns>
         
         [HttpPost("{bookname}"), Authorize(Roles = "Client")]
-        public async Task<ActionResult<List<Book>>> AddToFavourites(string username, string bookname)
+        public async Task<ActionResult<List<Book>>> AddToFavourites(string bookname)
         {
             var book = await _context.Books.Where(c => c.Book_Name == bookname)
                 .Include(c => c.Users).FirstOrDefaultAsync();
@@ -180,7 +179,7 @@ namespace Library.Controllers
             {
                 return BadRequest();
             }
-            var curuser = await _context.Users.Where(c => c.User_Email == username)
+            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser.User_Email)
         .FirstOrDefaultAsync();
 
             book.Users.Add(curuser);
@@ -194,7 +193,7 @@ namespace Library.Controllers
         /// <param name="bookname"></param>
         /// <returns></returns>
         [HttpDelete("{bookname}"), Authorize(Roles = "Client")]
-        public async Task<ActionResult<List<Book>>> DeleteFromFavourites(string username, string bookname)
+        public async Task<ActionResult<List<Book>>> DeleteFromFavourites(string bookname)
         {
             var book = await _context.Books.Where(c => c.Book_Name == bookname)
                 .Include(c => c.Users).FirstOrDefaultAsync();
@@ -202,7 +201,7 @@ namespace Library.Controllers
             {
                 return BadRequest();
             }
-            var curuser = await _context.Users.Where(c => c.User_Email == username)
+            var curuser = await _context.Users.Where(c => c.User_Email == Globals.CurUser.User_Email)
         .FirstOrDefaultAsync();
             if (curuser == null)
             {

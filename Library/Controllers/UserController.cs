@@ -65,16 +65,8 @@ namespace Library.Controller
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(User user)
         {
-            if (userjwt.Username != user.User_Email)
-            {
-                return BadRequest("User not found.");
-            }
-            if(!VerifyPasswordHash(user.User_Password, userjwt.PasswordHash, userjwt.PasswordSalt))
-            {
-                return BadRequest("Wrong password");
-            }
             string token = "";
-            if (_context.Users.Any(info => info.User_Email == userjwt.Username && info.User_Position == "admin"))
+            if (_context.Users.Any(info => info.User_Email == user.User_Email && info.User_Position == "admin"))
             {
                 token = CreateTokenAdmin(userjwt);
             }
@@ -118,6 +110,7 @@ namespace Library.Controller
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            Globals.CurUser.User_Email = userjwt.Username;
             return jwt;
         }
         private string CreateTokenAdmin(UserJWT userjwt)
@@ -138,6 +131,7 @@ namespace Library.Controller
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            Globals.CurUser.User_Email = userjwt.Username;
             return jwt;
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -147,14 +141,6 @@ namespace Library.Controller
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
-        }
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computeHash.SequenceEqual(passwordHash);
-            } 
         }
     }
         }
