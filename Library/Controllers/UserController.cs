@@ -25,20 +25,6 @@ namespace Library.Controller
             _configuration = configuration;
         }
         /// <summary>
-        /// Gets a client based on user email
-        /// </summary>
-        /// <param name="useremail"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<User>>> Get(string useremail)
-        {
-            var users = await _context.Users
-                .Where(c => c.User_Email == useremail)
-                .Include(c => c.Books).ToListAsync();
-
-            return users;
-        }
-        /// <summary>
         /// Creates new user
         /// </summary>
         /// <param name="user"></param>
